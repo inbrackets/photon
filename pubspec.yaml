@@ -1,0 +1,16 @@
+name: photon
+description: A starting point for Dart libraries or applications.
+# version: 1.0.0
+# homepage: https://www.example.com
+# author: mitch <email@example.com>
+
+environment:
+  sdk: '>=2.0.0 <3.0.0'
+
+dependencies:
+  reflectable: ^2.0.7
+
+dev_dependencies:
+  test: ^1.0.0
+  build_runner: ^0.10.0
+  build_web_compilers: ^0.4.0
