@@ -8,5 +8,6 @@ export 'src/photon_component.dart';
 export 'src/photon_reflector.dart' show component;
 export 'src/photon_logger.dart';
 export 'src/photon_dom.dart';
+export 'src/photon_velement.dart';
 
 // TODO: Export any libraries intended for clients of this package.

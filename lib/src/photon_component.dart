@@ -1,22 +1,29 @@
 import 'dart:html';
+import 'package:photon/photon.dart';
 import 'package:photon/src/photon_logger.dart';
 import 'package:photon/src/proton_nodevalidator.dart';
 import 'package:reflectable/reflectable.dart';
 import 'package:photon/src/photon_reflector.dart';
 
 @component
-class Component {
+class Component extends VElement {
   final List<Type> childComponents;
   Map<String, ClassMirror> _childTags = {};
   TrustedNodeValidator _validator;
   static String name = "Component";
-  Element _el;
+  //Element _el;
   String _previousTemplate = "";
-  Map<String, Component> _children = {};
+  //Map<String, Component> _children = {};
 
-  Element get el {
+  /*Element get el {
     return _el;
   }
+
+  VElement get vel {
+    return _vel;
+  }*/
+
+
 
   Component() : super(){
     _createValidator();
@@ -53,16 +60,18 @@ class Component {
     // previous template allows for a quick string comparison to avoid tree parsing if nothing has changed
     Logger().log(logKeys.General, "Template changed - patching dom");
     _previousTemplate = template;
-    if (_el == null) {
+    /*if (_el == null) {
       print("this");
 
       _el = Element.html(template, validator: _validator); //todo: fix first render to only mount children
-    }
-    Element newEl = Element.html(this.template, validator: _validator);
-    _patch(_el, newEl, "0");
+    }*/
+
+    parseElementTree(this, Element.html(template, validator: _validator), null, _childTags);
+    //Element newEl = Element.html(this.template, validator: _validator);
+    //_patch(_el, newEl, "0");
   }
 
-  void _patch(Element target, Element source, String positionKey) {
+  /*void _patch(Element target, Element source, String positionKey) {
     if (_childTags[source.tagName] != null) { //special tags must be handled seperately by the object itself
       Logger().log(logKeys.General, "Found class element - attending to this");
       if (_children[positionKey] == null) {
@@ -88,7 +97,7 @@ class Component {
     for (int i = 0; i < target.children.length; i++) {
       _patch(target.children[i], source.children[i], "$positionKey.$i");
     }
-  }
+  }*/
 
   void rerender() {
     if (_previousTemplate == template) {
