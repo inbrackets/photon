@@ -87,7 +87,7 @@ class Component extends VElement {
           continue;
         } else if ("${C.instanceMembers[k].reflectedReturnType}".startsWith("State")) { //todo: fix this
           State s = comp.invokeGetter(k);
-          s.subscribe(this._subscribeAndRender);
+          s.subscribe(this._subscribeAndRender); //todo: unsubscribe
         }
         print("$k ${C.instanceMembers[k].reflectedReturnType}");
       } catch (e) {
