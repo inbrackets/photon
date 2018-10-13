@@ -52,6 +52,7 @@ class VElement {
     }
     this.attributes = el.attributes;
     this.text = el.children.length == 0 && el.text != "" ? el.text : "";
+    // todo: test for list here
     if (this._children.length != el.children.length) {
       this._children.forEach((VElement v) => v._destroy());
       this.children = genChildren(this._root, el, this._parent, this._root.childTags);
@@ -68,6 +69,13 @@ class VElement {
   String _text = "";
   Element _el;
   Component _root;
+
+  Component get root => _root;
+
+  set root(Component value) {
+    _root = value;
+  }
+
   List<VElement> _children = null;
 
   List<VElement> get children => _children;
@@ -97,14 +105,13 @@ class VElement {
 
   void genEl() {
     if (_text == "") {
-      _el = Element.html("<$_tag />");
+      _el = Element.html("<$_tag />", validator: this.root.validator);
     } else {
-      _el = Element.html("<$_tag>$_text</$_tag>");
+      _el = Element.html("<$_tag>$_text</$_tag>", validator: this.root.validator);
     }
     _el.attributes = sanitizeAttributes();
     addListeners();
     if (_parent != null) {
-      print(_el.children);
       _parent.addChild(_el);
     }
   }

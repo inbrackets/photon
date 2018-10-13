@@ -4,13 +4,16 @@ class TrustedNodeValidator implements NodeValidator {
   NodeValidatorBuilder _validator;
   TrustedNodeValidator () {
     _validator = NodeValidatorBuilder.common();
-    _validator..allowCustomElement("null");
+    allowCustomElement("NULL");
+    allowCustomElement("LIST");
   }
 
   allowCustomElement(String tagName,
       {UriPolicy uriPolicy,
         Iterable<String> attributes,
         Iterable<String> uriAttributes}) {
+    print("$tagName");
+
     _validator..allowCustomElement(tagName,
     attributes: attributes, uriPolicy: uriPolicy, uriAttributes: uriAttributes);
   }

@@ -52,6 +52,8 @@ class Bob extends Component {
         <div class="1" style="color: ${color.value}">Test 2</div>
         <div class="1">Test 3</div>
         <div class="1">Test 4</div>
+        ${["<div>1</div>", "<div>2</div>", "<div>3</div>"]}
+        <null/>
       </div>
     ''';
   }

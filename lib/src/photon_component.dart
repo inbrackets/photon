@@ -17,7 +17,7 @@ class Component extends VElement {
     _childTags = value;
   }
 
-  TrustedNodeValidator _validator;
+  TrustedNodeValidator validator;
   static get name => "Component";
   String _previousTemplate = "";
 
@@ -32,7 +32,7 @@ class Component extends VElement {
   }
 
   void _createValidator() {
-    _validator = TrustedNodeValidator();
+    validator = TrustedNodeValidator();
     //_validator..allowCustomElement("null");
     for (Type c in childComponents) {
       ClassMirror C = component.reflectType(c);
@@ -42,7 +42,7 @@ class Component extends VElement {
         throw "Tag collision, tag '$name' appears twice in components in this.childComponents";
       }
       childTags[name] = C;
-      _validator
+      validator
         ..allowCustomElement(name,
             attributes: ['df-tag', 'df-props', 'df-style']);
     }
@@ -60,10 +60,10 @@ class Component extends VElement {
     _previousTemplate = template;
     if (el == null) {
       parseElementTree(
-          this, Element.html(template, validator: _validator), null, childTags);
+          this, Element.html(template, validator: validator), null, childTags);
     } else {
       beforeUpdate();
-      this.patchEl(Element.html(template, validator: _validator));
+      this.patchEl(Element.html(template, validator: validator));
       afterUpdate();
     }
   }
@@ -75,7 +75,7 @@ class Component extends VElement {
       return;
     }
     Logger().log(logKeys.General, "Template changed - patching dom");
-    Element newEl = Element.html(this.template, validator: _validator);
+    Element newEl = Element.html(this.template, validator: validator);
   }
 
   void _subscribeToState () {
