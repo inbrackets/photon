@@ -24,6 +24,8 @@ class TrustedNodeValidator implements NodeValidator {
       return true;
     } else if (attributeName.startsWith(RegExp(r"on"))) {
       return true;
+    } else if (attributeName == "style") {
+      return true;
     }
     return _validator.allowsAttribute(element, attributeName, value);
   }

@@ -29,16 +29,27 @@ class Bob extends Component {
   @override
   List<Type> childComponents = [];
   @override
-  static String name = "bob";
-  void bob(Event e) {
-    print("Printing bob");
+  static get name => "bob";
+  void toggleColour(Event e) {
+    print("turning blue");
+    this.color.value = this.color.value == "blue" ? "red" : "blue";
+    //this.render();
   }
+  void red(Event e) {
+    print("turning red");
+    this.color.value = "red";
+    this.method = "blue";
+
+    //this.render();
+  }
+  String method = "blue";
+  StateValue<String> color = StateValue("red");
   @override
   get template {
     return '''
       <div class="bob2">
-        <div class="1" onclick="bob">Test 1</div>
-        <div class="1">Test 2</div>
+        <div class="1" onclick="toggleColour">Test 1</div>
+        <div class="1" style="color: ${color.value}">Test 2</div>
         <div class="1">Test 3</div>
         <div class="1">Test 4</div>
       </div>

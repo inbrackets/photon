@@ -13,7 +13,12 @@ class VElement {
     this._root = root;
     this.genEl();
     this.parent = parent;
-    this.children = el.children.map((Element e) {
+    this.children = genChildren(root, el, parent, childTags);
+    return this;
+  }
+
+  List<VElement> genChildren (Component root, Element el, VElement parent, Map<String, ClassMirror> childTags) {
+    return el.children.map((Element e) {
       if (childTags.containsKey(e.tagName)) {
         Component comp = childTags[e.tagName].newInstance("", []);
         comp.parent = this;
@@ -22,7 +27,6 @@ class VElement {
         return VElement().parseElementTree(root, e, this, childTags);
       }
     }).toList();
-    return this;
   }
 
   Map<String, String> get attributes => _attributes;
@@ -48,6 +52,13 @@ class VElement {
     }
     this.attributes = el.attributes;
     this.text = el.children.length == 0 && el.text != "" ? el.text : "";
+    if (this._children.length != el.children.length) {
+      this._children.forEach((VElement v) => v._destroy());
+      this.children = genChildren(this._root, el, this._parent, this._root.childTags);
+    }
+    for (var i = 0; i < this._children.length; i++) {
+      this._children[i].patchEl(el.children[i]);
+    }
   }
 
   Map<String, String> _attributes = {};
@@ -58,11 +69,14 @@ class VElement {
   Element _el;
   Component _root;
   List<VElement> _children = null;
-  VElement _vel = null;
 
-  set children (List<VElement> children) {
-    _children = children;
+  List<VElement> get children => _children;
+
+  set children(List<VElement> value) {
+    _children = value;
   }
+
+  VElement _vel = null;
 
   set parent (VElement parent) {
     _parent = parent;
@@ -80,22 +94,6 @@ class VElement {
     //print(el);
     _el.append(el);
   }
-
-  /*VElement(
-      {Map<String, String> attributes = const {},
-      VElement parent = null,
-      String tag = "",
-      Component component = null,
-      String text = "",
-      List<VElement> children = const []}) {
-    _attributes = attributes;
-    _parent = parent;
-    _tag = tag;
-    _component = component;
-    _text = text;
-    _children = children;
-    this.genEl();
-  }*/
 
   void genEl() {
     if (_text == "") {
@@ -125,10 +123,14 @@ class VElement {
     return cleanAttributes;
   }
 
+  bool _isListener (String k) {
+    return k.startsWith("on");
+  }
+
   void addListeners () {
     InstanceMirror comp = component.reflect(_root);
     for (String k in _attributes.keys) {
-      if (k.startsWith("on")) {
+      if (_isListener(k)) {
         var sub = _el.on[k.substring(2)].listen((Event e) {
           comp.invoke(_attributes[k], [e]);
         });
@@ -142,18 +144,31 @@ class VElement {
     var newAttKeySet = newAtt.keys.toSet();
     var intersection = attKeyset.intersection(newAttKeySet);
     var elAttributes = _el.attributes;
+    InstanceMirror comp = component.reflect(_root);
     for (String k in _attributes.keys) {
       if (intersection.contains(k)) {
         if (_attributes[k] != newAtt[k]) {
           _attributes[k] = newAtt[k];
           if (checkAttributes(k)) {
             elAttributes[k] = _attributes[k];
+          } else if (_isListener(k)) {
+            if (_listeners[k] != null) {
+              _listeners[k].sub.cancel();
+              _listeners.remove(k);
+            }
+            var sub = _el.on[k.substring(2)].listen((Event e) {
+              comp.invoke(_attributes[k], [e]);
+            });
+            _listeners[k] = OnXListener(_attributes[k], sub);
           }
         }
       } else {
         _attributes.remove(k);
         if (checkAttributes(k)) {
           elAttributes.remove(k);
+        } else if (_isListener(k)) {
+          _listeners[k].sub.cancel();
+          _listeners.remove(k);
         }
       }
     }
@@ -173,6 +188,17 @@ class VElement {
 
   set el(Element value) {
     _el = value;
+  }
+
+  void _destroy() {
+    beforeDestroy();
+    _cancelListeners();
+    this.children.forEach((VElement v) => v._destroy());
+    afterDestroy();
+  }
+  void beforeDestroy() {
+  }
+  void afterDestroy() {
   }
 }
 

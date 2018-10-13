@@ -1,5 +1,8 @@
 enum logKeys {
-  General
+  General,
+  Update,
+  Mount,
+  Destroy
 }
 
 class Logger {
