@@ -8,7 +8,15 @@ import 'package:photon/src/photon_reflector.dart';
 @component
 class Component extends VElement {
   final List<Type> childComponents;
+  List<Component> _children; //children for rerendering
   Map<String, ClassMirror> _childTags = {};
+
+  Map<String, ClassMirror> get childTags => _childTags;
+
+  set childTags(Map<String, ClassMirror> value) {
+    _childTags = value;
+  }
+
   TrustedNodeValidator _validator;
   static String name = "Component";
   //Element _el;
@@ -22,6 +30,8 @@ class Component extends VElement {
   VElement get vel {
     return _vel;
   }*/
+
+
 
 
 
@@ -41,10 +51,10 @@ class Component extends VElement {
       ClassMirror C = component.reflectType(c);
       String name = C.invokeGetter("name");
       name = name.toUpperCase();
-      if (_childTags[name] != null) {
+      if (childTags[name] != null) {
         throw "Tag collision, tag '$name' appears twice in components in this.childComponents";
       }
-      _childTags[name] = C;
+      childTags[name] = C;
       _validator
         ..allowCustomElement(name,
             attributes: ['df-tag', 'df-props', 'df-style']);
@@ -66,7 +76,7 @@ class Component extends VElement {
       _el = Element.html(template, validator: _validator); //todo: fix first render to only mount children
     }*/
 
-    parseElementTree(this, Element.html(template, validator: _validator), null, _childTags);
+    parseElementTree(this, Element.html(template, validator: _validator), null, childTags);
     //Element newEl = Element.html(this.template, validator: _validator);
     //_patch(_el, newEl, "0");
   }
