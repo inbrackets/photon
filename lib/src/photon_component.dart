@@ -37,6 +37,7 @@ class Component extends VElement {
     for (Type c in childComponents) {
       ClassMirror C = component.reflectType(c);
       String name = C.invokeGetter("name");
+      print(name);
       name = name.toUpperCase();
       if (childTags[name] != null) {
         throw "Tag collision, tag '$name' appears twice in components in this.childComponents";
@@ -89,7 +90,6 @@ class Component extends VElement {
           State s = comp.invokeGetter(k);
           s.subscribe(this._subscribeAndRender); //todo: unsubscribe
         }
-        print("$k ${C.instanceMembers[k].reflectedReturnType}");
       } catch (e) {
         continue;
     }

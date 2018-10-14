@@ -23,7 +23,7 @@ class TrustedNodeValidator implements NodeValidator {
   }
 
   bool allowsAttribute(element, attributeName, value) {
-    if (attributeName.startsWith(RegExp(r"pro-"))) {
+    if (attributeName.startsWith(RegExp(r"p-"))) {
       return true;
     } else if (attributeName.startsWith(RegExp(r"on"))) {
       return true;

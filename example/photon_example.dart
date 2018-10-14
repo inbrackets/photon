@@ -24,10 +24,21 @@ class Sam extends Component {
   }
 }
 
+class Singleton {
+  static final Singleton _singleton = new Singleton._internal();
+
+  factory Singleton() {
+    return _singleton;
+  }
+
+  Singleton._internal();
+  StateValue<String> color = StateValue("red");
+}
+
 @component
 class Bob extends Component {
   @override
-  List<Type> childComponents = [];
+  List<Type> childComponents = [Sub];
   @override
   static get name => "bob";
   void toggleColour(Event e) {
@@ -43,7 +54,7 @@ class Bob extends Component {
     //this.render();
   }
   String method = "blue";
-  StateValue<String> color = StateValue("red");
+  StateValue<String> color = Singleton().color;
   @override
   get template {
     return '''
@@ -52,8 +63,30 @@ class Bob extends Component {
         <div class="1" style="color: ${color.value}">Test 2</div>
         <div class="1">Test 3</div>
         <div class="1">Test 4</div>
-        ${["<div>1</div>", "<div>2</div>", "<div>3</div>"]}
+        <list>
+        ${["<div p-key='1'>1</div>", "<div p-key='2'>2</div>", "<div p-key='3'>3</div>"]}
+        </list>
+        <subComp/>
         <null/>
+      </div>
+    ''';
+  }
+}
+
+@component
+class Sub extends Component {
+  @override
+  final List<Type> childComponents = [];
+  @override
+  static String name = "subcomp";
+  static bob () => "john";
+  String test = "samuel";
+  StateValue<String> color = Singleton().color;
+  @override
+  get template {
+    return '''
+      <div class="bob">
+        <div class="1" style="color: ${color.value}">Sub color</div>
       </div>
     ''';
   }

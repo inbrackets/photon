@@ -18,6 +18,12 @@ class VElement {
   }
 
   List<VElement> genChildren (Component root, Element el, VElement parent, Map<String, ClassMirror> childTags) {
+    if (this._tag == "LIST") {
+      // check that all children have key prop
+      if (el.children.where((Element e) => e.attributes["p-key"] == null).length != 0) {
+        throw "All children of a list should have a p-key attribute";
+      }
+    }
     return el.children.map((Element e) {
       if (childTags.containsKey(e.tagName)) {
         Component comp = childTags[e.tagName].newInstance("", []);
@@ -46,18 +52,33 @@ class VElement {
   }
 
   void patchEl(Element el) {
+    if (this is Component && this._tag != el.tagName) {
+//      print("Hello from here");
+      (this as Component).render();
+    //todo: set props here
+      return;
+    }
     if (this._tag != el.tagName) {
+      print("${this._tag}, ${el.tagName}, ${this is Component}");
       this.parseElementTree(this._root, el, this._parent, this._root.childTags);
       return;
     }
     this.attributes = el.attributes;
     this.text = el.children.length == 0 && el.text != "" ? el.text : "";
-    // todo: test for list here
+    if (this._tag == "LIST") {
+      var existingKeys = this._children.map((VElement e) => e.attributes["p-key"]).toSet();
+      var newKeys = el.children.map((Element e) => e.attributes["p-key"]).toSet();
+      var keepKeys = existingKeys.intersection(newKeys);
+      var deleteKeys = existingKeys.difference(keepKeys);
+      var addKeys = newKeys.difference(keepKeys);
+      return;
+    }
     if (this._children.length != el.children.length) {
       this._children.forEach((VElement v) => v._destroy());
       this.children = genChildren(this._root, el, this._parent, this._root.childTags);
     }
     for (var i = 0; i < this._children.length; i++) {
+      print("this is working");
       this._children[i].patchEl(el.children[i]);
     }
   }
@@ -117,7 +138,7 @@ class VElement {
   }
 
   bool checkAttributes(String k) {
-    return !(k.startsWith("on") || k.startsWith("pro-"));
+    return !(k.startsWith("on") || k.startsWith("p-"));
   }
 
   Map<String, String> sanitizeAttributes() {
