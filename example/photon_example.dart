@@ -58,6 +58,12 @@ class Bob extends Component {
   void listPrint(Event e, int i) {
     print("Clicked list item $i");
   }
+
+  StateList<int> items = StateList<int>([1, 2,3, 4]);
+  void addItem(Event e) {
+    var key = this.items.value.last+1;
+    items.add(key);
+  }
   @override
   get template {
     return '''
@@ -69,6 +75,10 @@ class Bob extends Component {
         <list>
         ${["<div p-key='1' onclick='listPrint'>1</div>", "<div p-key='2' onclick='listPrint'>2</div>", "<div p-key='3' onclick='listPrint'>3</div>"]}
         </list>
+        <list>
+        ${items.value.map((int i) => '<div p-key="$i" onclick="listPrint">$i</div>')}
+        </list>
+        <button onclick="addItem">add item</button>
         <subComp/>
         <null/>
       </div>

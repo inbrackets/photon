@@ -25,7 +25,7 @@ class StateValue<T> implements State<T> {
       type = valueSet;
     }
     _value = value;
-    el.dispatchEvent(CustomEvent(type, detail: value));
+    el.dispatchEvent(CustomEvent(type, detail: value)); //todo make this a function so it can be called from outside
   }
   StreamSubscription subscribeType(String type, EventListener f) {
     return el.on[type].listen(f);
@@ -38,4 +38,12 @@ class StateValue<T> implements State<T> {
     this.value = val;
   }
 
+}
+
+class StateList<T> extends StateValue<List<T>> {
+  StateList (List<T> val) : super(val);
+  void add (T val) {
+    this._value.add(val);
+    el.dispatchEvent(CustomEvent(valueChange, detail: value));
+  }
 }
