@@ -6,12 +6,16 @@ import 'package:reflectable/mirrors.dart';
 
 @component
 class VElement {
-  VElement parseElementTree(Component root, Element el, VElement parent, Map<String, ClassMirror> childTags) {
+  VElement parseElementTree(Component root, Element el, VElement parent, Map<String, ClassMirror> childTags, {int index}) {
     this._attributes = el.attributes;
     this._tag = el.tagName;
     this._text = el.children.length == 0 && el.text != "" ? el.text : "";
     this._root = root;
-    this.genEl();
+    if (index == null) {
+      this.genEl();
+    } else {
+      this.genEl(index: index);
+    }
     this.parent = parent;
     this.children = genChildren(root, el, parent, childTags);
     return this;
@@ -24,13 +28,19 @@ class VElement {
         throw "All children of a list should have a p-key attribute";
       }
     }
+    var index = -1;
     return el.children.map((Element e) {
+      index++;
       if (childTags.containsKey(e.tagName)) {
         Component comp = childTags[e.tagName].newInstance("", []);
         comp.parent = this;
         return comp;
       } else {
-        return VElement().parseElementTree(root, e, this, childTags);
+        if (this._tag == "LIST") {
+          return VElement().parseElementTree(root, e, this, childTags, index: index);
+        } else {
+          return VElement().parseElementTree(root, e, this, childTags);
+        }
       }
     }).toList();
   }
@@ -124,14 +134,18 @@ class VElement {
     _el.append(el);
   }
 
-  void genEl() {
+  void genEl({int index}) {
     if (_text == "") {
       _el = Element.html("<$_tag />", validator: this.root.validator);
     } else {
       _el = Element.html("<$_tag>$_text</$_tag>", validator: this.root.validator);
     }
     _el.attributes = sanitizeAttributes();
-    addListeners();
+    if (index == null) {
+      addListeners();
+    } else {
+      addListeners(index: index);
+    }
     if (_parent != null) {
       _parent.addChild(_el);
     }
@@ -155,12 +169,16 @@ class VElement {
     return k.startsWith("on");
   }
 
-  void addListeners () {
+  void addListeners ({int index}) {
     InstanceMirror comp = component.reflect(_root);
     for (String k in _attributes.keys) {
       if (_isListener(k)) {
         var sub = _el.on[k.substring(2)].listen((Event e) {
-          comp.invoke(_attributes[k], [e]);
+          if (index == null) {
+            comp.invoke(_attributes[k], [e]);
+          } else {
+            comp.invoke(_attributes[k], [e, index]);
+          }
         });
         _listeners[k] = OnXListener(_attributes[k], sub);
       }

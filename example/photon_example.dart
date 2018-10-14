@@ -55,6 +55,9 @@ class Bob extends Component {
   }
   String method = "blue";
   StateValue<String> color = Singleton().color;
+  void listPrint(Event e, int i) {
+    print("Clicked list item $i");
+  }
   @override
   get template {
     return '''
@@ -64,7 +67,7 @@ class Bob extends Component {
         <div class="1">Test 3</div>
         <div class="1">Test 4</div>
         <list>
-        ${["<div p-key='1'>1</div>", "<div p-key='2'>2</div>", "<div p-key='3'>3</div>"]}
+        ${["<div p-key='1' onclick='listPrint'>1</div>", "<div p-key='2' onclick='listPrint'>2</div>", "<div p-key='3' onclick='listPrint'>3</div>"]}
         </list>
         <subComp/>
         <null/>

@@ -10,7 +10,6 @@ class Component extends VElement {
   final List<Type> childComponents;
   List<Component> _children; //children for rerendering
   Map<String, ClassMirror> _childTags = {};
-
   Map<String, ClassMirror> get childTags => _childTags;
 
   set childTags(Map<String, ClassMirror> value) {
@@ -26,6 +25,8 @@ class Component extends VElement {
     this.render();
     _subscribeToState();
   }
+
+
 
   get template {
     return '<div>This is a Component</div>';
