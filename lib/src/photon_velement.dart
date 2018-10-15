@@ -11,11 +11,7 @@ class VElement {
     this._tag = el.tagName;
     this._text = el.children.length == 0 && el.text != "" ? el.text : "";
     this._root = root;
-    if (index == null) {
-      this.genEl();
-    } else {
-      this.genEl(index: index);
-    }
+    this.genEl(index: index);
     this.parent = parent;
     this.children = genChildren(root, el, parent, childTags);
     return this;
@@ -141,11 +137,7 @@ class VElement {
       _el = Element.html("<$_tag>$_text</$_tag>", validator: this.root.validator);
     }
     _el.attributes = sanitizeAttributes();
-    if (index == null) {
-      addListeners();
-    } else {
-      addListeners(index: index);
-    }
+    addListeners(index: index);
     if (_parent != null) {
       _parent.addChild(_el);
     }
@@ -236,11 +228,11 @@ class VElement {
     _el = value;
   }
 
-  void _destroy() {
+  void _destroy({bool parentMounted = true}) {
     beforeDestroy();
     _cancelListeners();
     this._parent?.el?.children?.remove(this.el);
-    this.children.forEach((VElement v) => v._destroy()); //todo this is removing child even when parent is unmounted - set mounted flag
+    this.children.forEach((VElement v) => v._destroy(parentMounted: false)); //todo this is removing child even when parent is unmounted - set mounted flag
     afterDestroy();
   }
   void beforeDestroy() {
