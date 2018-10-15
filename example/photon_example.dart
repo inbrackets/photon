@@ -58,11 +58,11 @@ class Bob extends Component {
   void listPrint(Event e, int i) {
     print("Clicked list item $i");
   }
+  StateValue<bool> display = StateValue<bool>(false);
 
   StateList<int> items = StateList<int>([1, 2,3, 4]);
-  void addItem(Event e) {
-    var key = this.items.value.last+1;
-    items.add(key);
+  void toggleDisplay(Event e) {
+    display.value = !display.value;
   }
   @override
   get template {
@@ -78,7 +78,9 @@ class Bob extends Component {
         <list>
         ${items.value.map((int i) => '<div p-key="$i" onclick="listPrint">$i</div>')}
         </list>
-        <button onclick="addItem">add item</button>
+        <button onclick="toggleDisplay">toggle display</button>
+        ${display.value ? '<div>display 1</div>': '<div>display 2</div>'}
+        ${display.value ? NullString : '<div>showing hidden display</div>'}
         <subComp/>
         <null/>
       </div>

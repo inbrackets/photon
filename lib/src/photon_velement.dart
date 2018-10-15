@@ -239,7 +239,8 @@ class VElement {
   void _destroy() {
     beforeDestroy();
     _cancelListeners();
-    this.children.forEach((VElement v) => v._destroy());
+    this._parent?.el?.children?.remove(this.el);
+    this.children.forEach((VElement v) => v._destroy()); //todo this is removing child even when parent is unmounted - set mounted flag
     afterDestroy();
   }
   void beforeDestroy() {
