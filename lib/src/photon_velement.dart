@@ -11,8 +11,9 @@ class VElement {
     this._tag = el.tagName;
     this._text = el.children.length == 0 && el.text != "" ? el.text : "";
     this._root = root;
-    this.genEl(index: index);
-    this.parent = parent;
+    this._index = index;
+    this.genEl();
+    this.setParent(parent);
     this.children = genChildren(root, el, parent, childTags);
     return this;
   }
@@ -24,18 +25,18 @@ class VElement {
         throw "All children of a list should have a p-key attribute";
       }
     }
-    var index = -1;
+    var listindex = -1;
     return el.children.map((Element e) {
-      index++;
+      listindex++;
       if (childTags.containsKey(e.tagName)) {
         Component comp = childTags[e.tagName].newInstance("", []);
-        comp.parent = this;
+        comp.setParent(this);
         return comp;
       } else {
         if (this._tag == "LIST") {
-          return VElement().parseElementTree(root, e, this, childTags, index: index);
+          return VElement().parseElementTree(root, e, this, childTags, index: listindex);
         } else {
-          return VElement().parseElementTree(root, e, this, childTags);
+          return VElement().parseElementTree(root, e, this, childTags, index: _index);
         }
       }
     }).toList();
@@ -77,11 +78,39 @@ class VElement {
       var keepKeys = existingKeys.intersection(newKeys);
       var deleteKeys = existingKeys.difference(keepKeys);
       var addKeys = newKeys.difference(keepKeys);
+      Map<String, VElement> addItems = {};
+      var listindex = -1;
+      for (Element e in el.children) {
+        listindex++;
+        if (addKeys.contains(e.attributes["p-key"])) {
+          addItems[e.attributes["p-key"]] = VElement().parseElementTree(root, e, null, this._root.childTags, index: listindex);
+        }
+      }
+      listindex = -1;
+      for (VElement e in this._children) {
+        listindex++;
+        if (deleteKeys.contains(e.attributes["p-key"])) {
+          this._children.removeAt(listindex);
+        }
+      }
+      listindex = -1;
+      for (Element e in el.children) {
+        listindex++;
+        if (addKeys.contains(e.attributes["p-key"])) {
+          var vEl = addItems[e.attributes["p-key"]];
+          this._children.insert(listindex, vEl);
+          vEl.setParent(this, index: listindex);
+        } else {
+          this.children[listindex].patchEl(e);
+          this.children[listindex]._index = listindex;
+        }
+      }
       return;
     }
     if (this._children.length != el.children.length) {
       this._children.forEach((VElement v) => v._destroy());
       this.children = genChildren(this._root, el, this._parent, this._root.childTags);
+      print(this.children.length);
     }
     for (var i = 0; i < this._children.length; i++) {
       print("this is working");
@@ -96,6 +125,7 @@ class VElement {
   String _text = "";
   Element _el;
   Component _root;
+  int _index = null;
 
   Component get root => _root;
 
@@ -113,31 +143,35 @@ class VElement {
 
   VElement _vel = null;
 
-  set parent (VElement parent) {
+  void setParent (VElement parent, {int index}) {
     _parent = parent;
     if (_parent != null) {
-      _parent.addChild(_el);
+      _parent.addChild(_el, index: index);
     }
   }
 
 
 
-  void addChild(Element el) {
+  void addChild(Element el, {int index}) {
     if (_el.children.contains(el)) {
       return;
     }
     //print(el);
-    _el.append(el);
+    if (index == null) {
+      _el.append(el);
+    } else {
+      _el.children.insert(index, el);
+    }
   }
 
-  void genEl({int index}) {
+  void genEl() {
     if (_text == "") {
       _el = Element.html("<$_tag />", validator: this.root.validator);
     } else {
       _el = Element.html("<$_tag>$_text</$_tag>", validator: this.root.validator);
     }
     _el.attributes = sanitizeAttributes();
-    addListeners(index: index);
+    addListeners();
     if (_parent != null) {
       _parent.addChild(_el);
     }
@@ -160,16 +194,15 @@ class VElement {
   bool _isListener (String k) {
     return k.startsWith("on");
   }
-
-  void addListeners ({int index}) {
+  void addListeners () {
     InstanceMirror comp = component.reflect(_root);
     for (String k in _attributes.keys) {
       if (_isListener(k)) {
         var sub = _el.on[k.substring(2)].listen((Event e) {
-          if (index == null) {
+          if (_index == null) {
             comp.invoke(_attributes[k], [e]);
           } else {
-            comp.invoke(_attributes[k], [e, index]);
+            comp.invoke(_attributes[k], [e, _index]); //todo: fix this it is a closure, needs to get the new value;
           }
         });
         _listeners[k] = OnXListener(_attributes[k], sub);

@@ -58,11 +58,32 @@ class Bob extends Component {
   void listPrint(Event e, int i) {
     print("Clicked list item $i");
   }
+
+  void listPrintSub(Event e, int i) {
+    e.stopPropagation();
+    print("Clicked list item sub $i");
+  }
   StateValue<bool> display = StateValue<bool>(false);
 
   StateList<int> items = StateList<int>([1, 2,3, 4]);
   void toggleDisplay(Event e) {
     display.value = !display.value;
+  }
+
+  void addItem(Event e) {
+    var key = items.value.length + 1;
+    items.add(key);
+  }
+
+  void addItem2(Event e) {
+    var key = items.value.length + 1;
+    items.value.insert(2, key);
+    //items.value = items.value;
+    items.update();
+  }
+
+  void reorder(Event e) {
+    items.value = items.value.reversed.toList();
   }
   @override
   get template {
@@ -72,12 +93,18 @@ class Bob extends Component {
         <div class="1" style="color: ${color.value}">Test 2</div>
         <div class="1">Test 3</div>
         <div class="1">Test 4</div>
+        <!--<list>
+        ${["<div p-key='1' onclick='listPrint'><span>1</span> <span onclick='listPrintSub'>1</span></div>", "<div p-key='2' onclick='listPrint'>2</div>", "<div p-key='3' onclick='listPrint'>3</div>"]}
+        </list> -->
         <list>
-        ${["<div p-key='1' onclick='listPrint'>1</div>", "<div p-key='2' onclick='listPrint'>2</div>", "<div p-key='3' onclick='listPrint'>3</div>"]}
+        ${items.value.map((int i) => '<div p-key="$i" onclick="listPrint">$i</div>').toList()}
         </list>
-        <list>
-        ${items.value.map((int i) => '<div p-key="$i" onclick="listPrint">$i</div>')}
-        </list>
+        <!--<div>
+        ${items.value.map((int i) => '<div p-key="$i" onclick="listPrint">$i</div>').toList()}
+        </div>-->
+        <button onclick="addItem">add Item</button>
+        <button onclick="addItem2">add Item @2</button>
+        <button onclick="reorder">reorder</button>
         <button onclick="toggleDisplay">toggle display</button>
         ${display.value ? '<div>display 1</div>': '<div>display 2</div>'}
         ${display.value ? NullString : '<div>showing hidden display</div>'}
