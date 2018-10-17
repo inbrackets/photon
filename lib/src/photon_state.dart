@@ -30,7 +30,6 @@ class StateValue<T> implements State<T> {
       type = valueSet;
     }
     _value = value;
-     //todo make this a function so it can be called from outside
     trigger(type);
   }
   StreamSubscription subscribeType(String type, EventListener f) {
@@ -56,18 +55,36 @@ class StateValue<T> implements State<T> {
 
 }
 
-class StateList<T> extends StateValue<List<T>>  {
+// todo: check null values for optional
+
+class StateList<T> extends StateValue<List<T>> implements List<T> {
   StateList (List<T> val) : super(val);
+
+  @override
   void add (T val) {
     this._value.add(val);
     update();
   }
 
   @override
-  T first;
+  T get first {
+   return _value.first;
+  }
 
   @override
-  T last;
+  set first(T value) {
+    _value.first = value;
+  }
+
+  @override
+  T get last {
+    return _value.last;
+  }
+
+  @override
+  set last(T value) {
+    _value.last = value;
+  }
 
   @override
   int get length {
@@ -75,267 +92,295 @@ class StateList<T> extends StateValue<List<T>>  {
   }
 
   @override
+  set length(int newLength) {
+    _value.length = newLength;
+  }
+
+  @override
   List<T> operator +(List<T> other) {
-    // TODO: implement +
+    return _value + other;
   }
 
   @override
   T operator [](int index) {
-    // TODO: implement []
+    return _value[index];
   }
 
   @override
   void operator []=(int index, T value) {
-    // TODO: implement []=
+    _value[index] = value;
+    update();
   }
 
   @override
   void addAll(Iterable<T> iterable) {
-    // TODO: implement addAll
+    _value.addAll(iterable);
+    update();
   }
 
   @override
   bool any(bool Function(T element) test) {
-    // TODO: implement any
+    return _value.any(test);
   }
 
   @override
   Map<int, T> asMap() {
-    // TODO: implement asMap
+    return _value.asMap();
   }
 
   @override
   List<R> cast<R>() {
-    // TODO: implement cast
+    return _value.cast<R>();
   }
 
   @override
   void clear() {
-    // TODO: implement clear
+    _value.clear();
+    update();
   }
 
   @override
   bool contains(Object element) {
-    // TODO: implement contains
+    return _value.contains(element);
   }
 
   @override
   T elementAt(int index) {
-    // TODO: implement elementAt
+    return _value.elementAt(index);
   }
 
   @override
   bool every(bool Function(T element) test) {
-    // TODO: implement every
+    return _value.every(test);
   }
 
   @override
-  Iterable<T> expand<T>(Iterable<T> Function(T element) f) {
-    // TODO: implement expand
+  Iterable<R> expand<R>(Iterable<R> Function(T element) f) {
+    return _value.expand<R>(f);
   }
 
   @override
   void fillRange(int start, int end, [T fillValue]) {
-    // TODO: implement fillRange
+    _value.fillRange(start, end, fillValue);
+    update();
   }
 
   @override
   T firstWhere(bool Function(T element) test, {T Function() orElse}) {
-    // TODO: implement firstWhere
+    return _value.firstWhere(test, orElse: orElse);
   }
 
   @override
-  T fold<T>(T initialValue, T Function(T previousValue, T element) combine) {
-    // TODO: implement fold
+  R fold<R>(R initialValue, R Function(R previousValue, T element) combine) { //todo dunno if this is right
+    return _value.fold<R>(initialValue, combine);
   }
 
   @override
   Iterable<T> followedBy(Iterable<T> other) {
-    // TODO: implement followedBy
+    return _value.followedBy(other);
   }
 
   @override
   void forEach(void Function(T element) f) {
-    // TODO: implement forEach
+    _value.forEach(f);
   }
 
   @override
   Iterable<T> getRange(int start, int end) {
-    // TODO: implement getRange
+    return _value.getRange(start, end);
   }
 
   @override
   int indexOf(T element, [int start = 0]) {
-    // TODO: implement indexOf
+    return _value.indexOf(element, start);
   }
 
   @override
   int indexWhere(bool Function(T element) test, [int start = 0]) {
-    // TODO: implement indexWhere
+    return _value.indexWhere(test, start);
   }
 
   @override
   void insert(int index, T element) {
-    // TODO: implement insert
+    _value.insert(index, element);
+    update();
   }
 
   @override
   void insertAll(int index, Iterable<T> iterable) {
-    // TODO: implement insertAll
+    _value.insertAll(index, iterable);
+    update();
   }
 
-  // TODO: implement isEmpty
   @override
-  bool get isEmpty => null;
+  bool get isEmpty => _value.isEmpty;
 
-  // TODO: implement isNotEmpty
   @override
-  bool get isNotEmpty => null;
+  bool get isNotEmpty => _value.isNotEmpty;
 
-  // TODO: implement iterator
   @override
-  Iterator<T> get iterator => null;
+  Iterator<T> get iterator => _value.iterator;
 
   @override
   String join([String separator = ""]) {
-    // TODO: implement join
+    return _value.join(separator);
   }
 
   @override
   int lastIndexOf(T element, [int start]) {
-    // TODO: implement lastIndexOf
+    return _value.lastIndexOf(element, start);
   }
 
   @override
   int lastIndexWhere(bool Function(T element) test, [int start]) {
-    // TODO: implement lastIndexWhere
+    return _value.lastIndexWhere(test, start);
   }
 
   @override
   T lastWhere(bool Function(T element) test, {T Function() orElse}) {
-    // TODO: implement lastWhere
+    return _value.lastWhere(test, orElse: orElse);
   }
 
   @override
-  Iterable<T> map<T>(T Function(T e) f) {
-    // TODO: implement map
+  Iterable<R> map<R>(R Function(T e) f) {
+    return _value.map<R>(f);
   }
 
   @override
   T reduce(T Function(T value, T element) combine) {
-    // TODO: implement reduce
+    return _value.reduce(combine);
   }
 
   @override
   bool remove(Object value) {
-    // TODO: implement remove
+    var rem = _value.remove(value);
+    update();
+    return rem;
   }
 
   @override
   T removeAt(int index) {
-    // TODO: implement removeAt
+    var rem = _value.removeAt(index);
+    update();
+    return rem;
   }
 
   @override
   T removeLast() {
-    // TODO: implement removeLast
+    var rem = _value.removeLast();
+    update();
+    return rem;
   }
 
   @override
   void removeRange(int start, int end) {
-    // TODO: implement removeRange
+    _value.removeRange(start, end);
+    update();
   }
 
   @override
   void removeWhere(bool Function(T element) test) {
-    // TODO: implement removeWhere
+    _value.removeWhere(test);
+    update();
+
   }
 
   @override
   void replaceRange(int start, int end, Iterable<T> replacement) {
-    // TODO: implement replaceRange
+    _value.replaceRange(start, end, replacement);
+    update();
   }
 
   @override
   void retainWhere(bool Function(T element) test) {
-    // TODO: implement retainWhere
+    _value.retainWhere(test);
+    update();
   }
 
   // TODO: implement reversed
   @override
-  Iterable<T> get reversed => null;
+  Iterable<T> get reversed => _value.reversed; //todo handle rerender here
 
   @override
   void setAll(int index, Iterable<T> iterable) {
-    // TODO: implement setAll
+    _value.setAll(index, iterable);
+    update();
   }
 
   @override
   void setRange(int start, int end, Iterable<T> iterable, [int skipCount = 0]) {
-    // TODO: implement setRange
+    _value.setRange(start, end, iterable, skipCount);
+    update();
   }
 
   @override
   void shuffle([Random random]) {
-    // TODO: implement shuffle
+    _value.shuffle(random);
+    update();
   }
 
-  // TODO: implement single
-  @override
-  T get single => null;
+ @override
+  T get single => _value.single;
 
   @override
   T singleWhere(bool Function(T element) test, {T Function() orElse}) {
-    // TODO: implement singleWhere
+    return _value.singleWhere(test, orElse: orElse);
   }
 
   @override
   Iterable<T> skip(int count) {
-    // TODO: implement skip
+    return _value.skip(count);
   }
 
   @override
   Iterable<T> skipWhile(bool Function(T value) test) {
-    // TODO: implement skipWhile
+    return _value.skipWhile(test);
   }
 
   @override
   void sort([int Function(T a, T b) compare]) {
-    // TODO: implement sort
+    if (compare == null) {
+      _value.sort();
+    } else {
+      _value.sort(compare);
+    }
+    update();
   }
 
   @override
   List<T> sublist(int start, [int end]) {
-    // TODO: implement sublist
+    return _value.sublist(start, end);
   }
 
   @override
   Iterable<T> take(int count) {
-    // TODO: implement take
+    return _value.take(count);
   }
 
   @override
   Iterable<T> takeWhile(bool Function(T value) test) {
-    // TODO: implement takeWhile
+    return _value.takeWhile(test);
   }
 
   @override
   List<T> toList({bool growable: true}) {
-    // TODO: implement toList
+    return _value.toList(growable: growable);
   }
 
   @override
   Set<T> toSet() {
-    // TODO: implement toSet
+    return _value.toSet();
   }
 
   @override
   Iterable<T> where(bool Function(T element) test) {
-    // TODO: implement where
+    return _value.where(test);
   }
 
   @override
-  Iterable<T> whereType<T>() {
-    // TODO: implement whereType
+  Iterable<R> whereType<R>() {
+    return _value.whereType<R>();
   }
+
+
 }
