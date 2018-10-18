@@ -54,6 +54,7 @@ class Bob extends Component {
     //this.render();
   }
   String method = "blue";
+  StateValue<String> input = StateValue("hello");
   StateValue<String> color = Singleton().color;
   void listPrint(Event e, int i) {
     print("Clicked list item $i");
@@ -73,6 +74,11 @@ class Bob extends Component {
   void addItem(Event e) {
     var key = items.value.length + 1;
     items.add(key);
+  }
+
+  void changeInput(Event e, VElement v) {
+    print((v.el as TextInputElement).value);
+    input((v.el as TextInputElement).value);
   }
 
   void addItem2(Event e) {
@@ -108,8 +114,11 @@ class Bob extends Component {
         <button onclick="toggleDisplay">toggle display</button>
         ${display.value ? '<div>display 1</div>': '<div>display 2</div>'}
         ${display.value ? NullString : '<div>showing hidden display</div>'}
-        <subComp/>
-        <null/>
+        <subComp></subComp>
+        <null></null>
+        <div>${input}</div>
+        <input type="text" value="${input}" p-change="changeInput" />
+        <div>Hello</div>
       </div>
     ''';
   }

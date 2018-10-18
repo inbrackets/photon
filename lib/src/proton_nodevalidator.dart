@@ -12,7 +12,6 @@ class TrustedNodeValidator implements NodeValidator {
       {UriPolicy uriPolicy,
         Iterable<String> attributes,
         Iterable<String> uriAttributes}) {
-    print("$tagName");
 
     _validator..allowCustomElement(tagName,
     attributes: attributes, uriPolicy: uriPolicy, uriAttributes: uriAttributes);

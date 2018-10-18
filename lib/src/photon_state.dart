@@ -13,9 +13,10 @@ abstract class State<T> {
   StreamSubscription subscribe(EventListener f);
   void update();
   void trigger(String type);
+  String toString();
 }
 
-class StateValue<T> implements State<T> {
+class StateValue<T> extends Function implements State<T> {
   Element el = Element.div();
   T _value;
 
@@ -31,6 +32,13 @@ class StateValue<T> implements State<T> {
     }
     _value = value;
     trigger(type);
+  }
+  String toString() {
+    return _value.toString();
+  }
+
+  call (T val) {
+    value = val;
   }
   StreamSubscription subscribeType(String type, EventListener f) {
     return el.on[type].listen(f);

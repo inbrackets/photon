@@ -192,17 +192,78 @@ class VElement {
   }
 
   bool _isListener (String k) {
-    return k.startsWith("on");
+    return k.startsWith("on") || k == "p-change";
   }
   void addListeners () {
     InstanceMirror comp = component.reflect(_root);
     for (String k in _attributes.keys) {
-      if (_isListener(k)) {
+      createListener(k, comp);
+    }
+  }
+
+  void createListener (String k, InstanceMirror comp) {
+    if (_isListener(k)) {
+      if (_listeners[k] != null) {
+        _listeners[k].sub.cancel();
+        _listeners.remove(k);
+      }
+      if (k == "p-change") {
+        var sub = el.onChange.listen((Event e) {
+          if (_index == null) {
+            comp.invoke(_attributes[k], [e, this]);
+          } else {
+            comp.invoke(_attributes[k], [e, this, _index
+            ]); //todo: fix this it is a closure, needs to get the new value;
+          }
+        });
+        _listeners["onchange"] = OnXListener(_attributes[k], sub);
+
+        sub = el.onKeyDown.listen((Event e) {
+          if (_index == null) {
+            comp.invoke(_attributes[k], [e, this]);
+          } else {
+            comp.invoke(_attributes[k], [e, this, _index
+            ]); //todo: fix this it is a closure, needs to get the new value;
+          }
+        });
+        _listeners["onkeydown"] = OnXListener(_attributes[k], sub);
+
+        sub = el.onKeyUp.listen((Event e) {
+          if (_index == null) {
+            comp.invoke(_attributes[k], [e, this]);
+          } else {
+            comp.invoke(_attributes[k], [e, this, _index
+            ]); //todo: fix this it is a closure, needs to get the new value;
+          }
+        });
+        _listeners["onkeyup"] = OnXListener(_attributes[k], sub);
+
+        sub = el.onCut.listen((Event e) {
+          if (_index == null) {
+            comp.invoke(_attributes[k], [e, this]);
+          } else {
+            comp.invoke(_attributes[k], [e, this, _index
+            ]); //todo: fix this it is a closure, needs to get the new value;
+          }
+        });
+        _listeners["oncut"] = OnXListener(_attributes[k], sub);
+
+        sub = el.onPaste.listen((Event e) {
+          if (_index == null) {
+            comp.invoke(_attributes[k], [e, this]);
+          } else {
+            comp.invoke(_attributes[k], [e, this, _index
+            ]); //todo: fix this it is a closure, needs to get the new value;
+          }
+        });
+        _listeners["onpaste"] = OnXListener(_attributes[k], sub);
+      } else {
         var sub = _el.on[k.substring(2)].listen((Event e) {
           if (_index == null) {
-            comp.invoke(_attributes[k], [e]);
+            comp.invoke(_attributes[k], [e, this]);
           } else {
-            comp.invoke(_attributes[k], [e, _index]); //todo: fix this it is a closure, needs to get the new value;
+            comp.invoke(_attributes[k], [e, this, _index
+            ]); //todo: fix this it is a closure, needs to get the new value;
           }
         });
         _listeners[k] = OnXListener(_attributes[k], sub);
@@ -222,15 +283,8 @@ class VElement {
           _attributes[k] = newAtt[k];
           if (checkAttributes(k)) {
             elAttributes[k] = _attributes[k];
-          } else if (_isListener(k)) {
-            if (_listeners[k] != null) {
-              _listeners[k].sub.cancel();
-              _listeners.remove(k);
-            }
-            var sub = _el.on[k.substring(2)].listen((Event e) {
-              comp.invoke(_attributes[k], [e]);
-            });
-            _listeners[k] = OnXListener(_attributes[k], sub);
+          } else {
+            createListener(k, comp);
           }
         }
       } else {
