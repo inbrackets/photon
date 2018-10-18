@@ -81,6 +81,15 @@ class Bob extends Component {
     input((v.el as TextInputElement).value);
   }
 
+  void changeInput2(Event e, VElement v) {
+    input((v.el as TextAreaElement).value);
+    (v.el as TextAreaElement).focus();
+  }
+
+  void changeInput3(Event e, VElement v) {
+    input((v.el as DivElement).text);
+  }
+
   void addItem2(Event e) {
     var key = items.value.length + 1;
     items.value.insert(2, key);
@@ -118,6 +127,8 @@ class Bob extends Component {
         <null></null>
         <div>${input}</div>
         <input type="text" value="${input}" p-change="changeInput" />
+        <textarea p-change="changeInput2">${input}</textarea>
+        <div contenteditable="true" p-change="changeInput3">${input}</div>
         <div>Hello</div>
       </div>
     ''';

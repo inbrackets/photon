@@ -28,6 +28,8 @@ class TrustedNodeValidator implements NodeValidator {
       return true;
     } else if (attributeName == "style") {
       return true;
+    } else if (attributeName == "contenteditable") {
+      return true;
     }
     return _validator.allowsAttribute(element, attributeName, value);
   }
