@@ -172,6 +172,10 @@ class VElement {
     }
     _el.attributes = sanitizeAttributes();
     addListeners();
+    // handle text area value attribute
+    if (this._el is TextAreaElement && _attributes.keys.contains("value")) {
+      (this._el as TextAreaElement).value = _attributes["value"];
+    }
     if (_parent != null) {
       _parent.addChild(_el);
     }
@@ -282,6 +286,11 @@ class VElement {
         if (_attributes[k] != newAtt[k]) {
           _attributes[k] = newAtt[k];
           if (checkAttributes(k)) {
+            if (k == "value" && this.el is TextInputElement) {
+              (this.el as TextInputElement).value = _attributes[k];
+            } else if (k == "value" && this.el is TextAreaElement) {
+              (this.el as TextAreaElement).value = _attributes[k];
+            }
             elAttributes[k] = _attributes[k];
           } else {
             createListener(k, comp);

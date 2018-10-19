@@ -30,6 +30,8 @@ class TrustedNodeValidator implements NodeValidator {
       return true;
     } else if (attributeName == "contenteditable") {
       return true;
+    } else if (element is TextAreaElement && attributeName == "value") {
+      return true;
     }
     return _validator.allowsAttribute(element, attributeName, value);
   }

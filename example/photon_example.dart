@@ -127,7 +127,7 @@ class Bob extends Component {
         <null></null>
         <div>${input}</div>
         <input type="text" value="${input}" p-change="changeInput" />
-        <textarea p-change="changeInput2">${input}</textarea>
+        <textarea  value="${input}" p-change="changeInput2"></textarea>
         <div contenteditable="true" p-change="changeInput3">${input}</div>
         <div>Hello</div>
       </div>
