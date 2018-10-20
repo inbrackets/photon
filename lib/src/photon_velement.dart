@@ -60,13 +60,11 @@ class VElement {
 
   void patchEl(Element el) {
     if (this is Component && this._tag != el.tagName) {
-//      print("Hello from here");
       (this as Component).render();
     //todo: set props here
       return;
     }
     if (this._tag != el.tagName) {
-      print("${this._tag}, ${el.tagName}, ${this is Component}");
       this.parseElementTree(this._root, el, this._parent, this._root.childTags);
       return;
     }
@@ -110,10 +108,8 @@ class VElement {
     if (this._children.length != el.children.length) {
       this._children.forEach((VElement v) => v._destroy());
       this.children = genChildren(this._root, el, this._parent, this._root.childTags);
-      print(this.children.length);
     }
     for (var i = 0; i < this._children.length; i++) {
-      print("this is working");
       this._children[i].patchEl(el.children[i]);
     }
   }
@@ -156,7 +152,6 @@ class VElement {
     if (_el.children.contains(el)) {
       return;
     }
-    //print(el);
     if (index == null) {
       _el.append(el);
     } else {
