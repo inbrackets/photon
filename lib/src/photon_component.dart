@@ -59,7 +59,7 @@ class Component<P extends Props> extends VElement {
       Logger().log(logKeys.General,
           "Skipping render - template has not changed - todo: rerender children");
       InstanceMirror thisComp = component.reflect(this);
-      for (Component c in componentChildren) {
+      for (Component c in componentChildren) {// todo: this should happen on every rerender not just if the template has not changed
         if (c.propsMethod != null) {
           var newProps = thisComp.invoke(c.propsMethod, []);
           c.props = newProps;
