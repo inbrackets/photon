@@ -30,6 +30,7 @@ class VElement {
     return el.children.map((Element e) {
       listindex++;
       if (childTags.containsKey(e.tagName)) {
+        // todo: components in lists
         if (e.attributes.keys.contains("p-props")) {
           print("this is working");
 
