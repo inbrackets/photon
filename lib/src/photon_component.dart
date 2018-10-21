@@ -7,12 +7,14 @@ import 'package:reflectable/reflectable.dart';
 import 'package:photon/src/photon_reflector.dart';
 
 @component
-class Component extends VElement {
+class Component<P extends Props> extends VElement {
   final List<Type> childComponents;
-  List<Component> _children; //children for rerendering
+  List<Component> componentChildren = []; //children for rerendering
   Map<String, ClassMirror> _childTags = {};
   Map<String, ClassMirror> get childTags => _childTags;
   List<StreamSubscription> _componentListeners = [];
+  String propsMethod = null;
+  P props;
 
   set childTags(Map<String, ClassMirror> value) {
     _childTags = value;
@@ -22,13 +24,13 @@ class Component extends VElement {
   static get name => "Component";
   String _previousTemplate = "";
 
-  Component() : super(){
+  Component() : this.withProps(null, null);
+
+  Component.withProps(this.props, this.propsMethod) : super() {
     _createValidator();
     this.render();
     _subscribeToState();
   }
-
-
 
   get template {
     return '<div>This is a Component</div>';
@@ -56,7 +58,14 @@ class Component extends VElement {
     if (_previousTemplate == template) {
       Logger().log(logKeys.General,
           "Skipping render - template has not changed - todo: rerender children");
-      //todo: rerender children
+      InstanceMirror thisComp = component.reflect(this);
+      for (Component c in componentChildren) {
+        if (c.propsMethod != null) {
+          var newProps = thisComp.invoke(c.propsMethod, []);
+          c.props = newProps;
+        }
+        c.render();
+      }
       return;
     }
     // previous template allows for a quick string comparison to avoid tree parsing if nothing has changed
@@ -89,7 +98,7 @@ class Component extends VElement {
       try {
         if (k.endsWith("=")) {
           continue;
-        } else if ("${C.instanceMembers[k].reflectedReturnType}".startsWith("State")) { //todo: fix this
+        } else if ("${C.instanceMembers[k].reflectedReturnType}".startsWith("State")) {
           State s = comp.invokeGetter(k);
           _componentListeners.add(s.subscribe(this._subscribeAndRender));
         }
@@ -114,7 +123,7 @@ class Component extends VElement {
     for (StreamSubscription s in _componentListeners) {
       s.cancel();
     }
-    super.destroy();
+    super.destroy(parentMounted: parentMounted);
   }
   @override
   void beforeDestroy() {

@@ -26,11 +26,23 @@ class VElement {
       }
     }
     var listindex = -1;
+    InstanceMirror rootComp = component.reflect(root);
     return el.children.map((Element e) {
       listindex++;
       if (childTags.containsKey(e.tagName)) {
+        if (e.attributes.keys.contains("p-props")) {
+          print("this is working");
+
+          var props = rootComp.invoke(e.attributes["p-props"], []);
+          print(props);
+          Component comp = childTags[e.tagName].newInstance("withProps", [props, e.attributes["p-props"]]);
+          comp.setParent(this);
+          root.componentChildren.add(comp);
+          return comp;
+        }
         Component comp = childTags[e.tagName].newInstance("", []);
         comp.setParent(this);
+        root.componentChildren.add(comp); //todo remove children
         return comp;
       } else {
         if (this._tag == "LIST") {

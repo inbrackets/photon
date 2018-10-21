@@ -13,12 +13,27 @@ class Sam extends Component {
   static String name = "sam";
   static bob () => "john";
   String test = "samuel";
+
+  StateValue<String> bobName = StateValue("My name is Bob");
+  StateValue<String> bobSurname = StateValue("My surname is jones");
+  BobProps bps() {
+    BobProps bp = BobProps();
+    bp.name = bobName.value;
+    bp.surname = bobSurname.value;
+    return bp;
+  }
+
+  void changeProps(Event e, VElement v) {
+    bobName.value = "My name is Sam";
+    bobSurname.value = "My surname is Smith";
+  }
   @override
   get template {
     return '''
       <div class="bob">
-        <bob df-tag="bob1">hello im $test</bob>
+        <bob p-props="bps">hello im $test</bob>
         <span>$test</span>
+        <button onclick="changeProps">Change name</button>
       </div>
     ''';
   }
@@ -35,8 +50,13 @@ class Singleton {
   StateValue<String> color = StateValue("red");
 }
 
+class BobProps implements Props {
+  String name;
+  String surname;
+}
+
 @component
-class Bob extends Component {
+class Bob extends Component<BobProps> {
   @override
   List<Type> childComponents = [Sub];
   @override
@@ -53,6 +73,9 @@ class Bob extends Component {
 
     //this.render();
   }
+
+  @override
+  Bob.withProps(BobProps props, String propsMethod) : super.withProps(props, propsMethod);
   String method = "blue";
   StateValue<String> input = StateValue("hello");
   StateValue<String> color = Singleton().color;
@@ -130,6 +153,7 @@ class Bob extends Component {
         <textarea  p-value="${input}" p-change="changeInput2"></textarea>
         <div contenteditable="true" p-change="changeInput3">${input}</div>
         <div>Hello</div>
+        <div>${this.props?.name}, ${this.props?.surname}</div>
       </div>
     ''';
   }
