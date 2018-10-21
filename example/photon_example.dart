@@ -41,12 +41,12 @@ class Bob extends Component {
   List<Type> childComponents = [Sub];
   @override
   static get name => "bob";
-  void toggleColour(Event e) {
+  void toggleColour(Event e, VElement v) {
     print("turning blue");
     this.color.value = this.color.value == "blue" ? "red" : "blue";
     //this.render();
   }
-  void red(Event e) {
+  void red(Event e, VElement v) {
     print("turning red");
     this.color.value = "red";
     this.method = "blue";
@@ -56,22 +56,22 @@ class Bob extends Component {
   String method = "blue";
   StateValue<String> input = StateValue("hello");
   StateValue<String> color = Singleton().color;
-  void listPrint(Event e, int i) {
+  void listPrint(Event e, VElement v, int i) {
     print("Clicked list item $i");
   }
 
-  void listPrintSub(Event e, int i) {
+  void listPrintSub(Event e, VElement v, int i) {
     e.stopPropagation();
     print("Clicked list item sub $i");
   }
   StateValue<bool> display = StateValue<bool>(false);
 
   StateList<int> items = StateList<int>([1, 2,3, 4]);
-  void toggleDisplay(Event e) {
+  void toggleDisplay(Event e, VElement v) {
     display.value = !display.value;
   }
 
-  void addItem(Event e) {
+  void addItem(Event e, VElement v) {
     var key = items.value.length + 1;
     items.add(key);
   }
@@ -90,14 +90,14 @@ class Bob extends Component {
     input((v.el as DivElement).text);
   }
 
-  void addItem2(Event e) {
+  void addItem2(Event e, VElement v) {
     var key = items.value.length + 1;
     items.value.insert(2, key);
     //items.value = items.value;
     items.update();
   }
 
-  void reorder(Event e) {
+  void reorder(Event e, VElement v) {
     items.value = items.value.reversed.toList();
   }
   @override

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:html';
 import 'package:photon/photon.dart';
 import 'package:photon/src/photon_logger.dart';
@@ -11,6 +12,7 @@ class Component extends VElement {
   List<Component> _children; //children for rerendering
   Map<String, ClassMirror> _childTags = {};
   Map<String, ClassMirror> get childTags => _childTags;
+  List<StreamSubscription> _componentListeners = [];
 
   set childTags(Map<String, ClassMirror> value) {
     _childTags = value;
@@ -89,7 +91,7 @@ class Component extends VElement {
           continue;
         } else if ("${C.instanceMembers[k].reflectedReturnType}".startsWith("State")) { //todo: fix this
           State s = comp.invokeGetter(k);
-          s.subscribe(this._subscribeAndRender); //todo: unsubscribe
+          _componentListeners.add(s.subscribe(this._subscribeAndRender));
         }
       } catch (e) {
         continue;
@@ -98,7 +100,6 @@ class Component extends VElement {
   }
 
   void _subscribeAndRender(Event e) {
-    print("rerendering");
     this.render();
   }
 
@@ -107,6 +108,13 @@ class Component extends VElement {
   }
   void afterUpdate() {
     Logger().log(logKeys.Update, "afterUpdate $name");
+  }
+  @override
+  void destroy({bool parentMounted = true}) {
+    for (StreamSubscription s in _componentListeners) {
+      s.cancel();
+    }
+    super.destroy();
   }
   @override
   void beforeDestroy() {

@@ -106,7 +106,7 @@ class VElement {
       return;
     }
     if (this._children.length != el.children.length) {
-      this._children.forEach((VElement v) => v._destroy());
+      this._children.forEach((VElement v) => v.destroy());
       this.children = genChildren(this._root, el, this._parent, this._root.childTags);
     }
     for (var i = 0; i < this._children.length; i++) {
@@ -330,11 +330,11 @@ class VElement {
     _el = value;
   }
 
-  void _destroy({bool parentMounted = true}) {
+  void destroy({bool parentMounted = true}) {
     beforeDestroy();
     _cancelListeners();
     this._parent?.el?.children?.remove(this.el);
-    this.children.forEach((VElement v) => v._destroy(parentMounted: false)); //todo this is removing child even when parent is unmounted - set mounted flag
+    this.children.forEach((VElement v) => v.destroy(parentMounted: false)); //todo this is removing child even when parent is unmounted - set mounted flag
     afterDestroy();
   }
   void beforeDestroy() {
