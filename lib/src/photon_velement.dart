@@ -190,7 +190,7 @@ class VElement {
           (this.el as TextAreaElement).value = _attributes[k];
         }
         if (k == "p-value") {
-          _attributes["value"] = _attributes[k];
+          cleanAttributes["value"] = _attributes[k];
         }
         cleanAttributes[k] = _attributes[k];
       }
@@ -295,7 +295,7 @@ class VElement {
               (this.el as TextAreaElement).value = _attributes[k];
             }
             if (k == "p-value") {
-              _attributes["value"] = _attributes[k];
+              elAttributes["value"] = _attributes[k];
             }
             elAttributes[k] = _attributes[k];
           } else {
