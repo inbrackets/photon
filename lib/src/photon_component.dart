@@ -8,7 +8,7 @@ import 'package:photon/src/photon_reflector.dart';
 
 @component
 class Component<P extends Props> extends VElement {
-  final List<Type> childComponents;
+  final List<Type> childComponents = [];
   List<Component> componentChildren = []; //children for rerendering
   Map<String, ClassMirror> _childTags = {};
   Map<String, ClassMirror> get childTags => _childTags;
@@ -20,8 +20,9 @@ class Component<P extends Props> extends VElement {
     _childTags = value;
   }
 
-  TrustedNodeValidator validator;
-  static get name => "Component";
+  TrustedNodeValidatorAll validator;
+  static String tagName = "Component";
+  get tagNameI => tagName;
   String _previousTemplate = "";
 
   Component() : this.withProps(null, null);
@@ -37,20 +38,21 @@ class Component<P extends Props> extends VElement {
   }
 
   void _createValidator() {
-    validator = TrustedNodeValidator();
+    validator = TrustedNodeValidatorAll();
     //_validator..allowCustomElement("null");
+    print(childComponents);
     for (Type c in childComponents) {
       ClassMirror C = component.reflectType(c);
-      String name = C.invokeGetter("name");
+      String name = C.invokeGetter("tagName");
       print(name);
       name = name.toUpperCase();
       if (childTags[name] != null) {
         throw "Tag collision, tag '$name' appears twice in components in this.childComponents";
       }
       childTags[name] = C;
-      validator
-        ..allowCustomElement(name,
-            attributes: ['df-tag', 'df-props', 'df-style']);
+//      validator
+//        ..allowCustomElement(name,
+//            attributes: ['df-tag', 'df-props', 'df-style']);
     }
   }
 
@@ -72,23 +74,15 @@ class Component<P extends Props> extends VElement {
     Logger().log(logKeys.General, "Template changed - patching dom");
     _previousTemplate = template;
     if (el == null) {
+      beforeCreate();
       parseElementTree(
           this, Element.html(template, validator: validator), null, childTags);
+      created();
     } else {
       beforeUpdate();
       this.patchEl(Element.html(template, validator: validator));
-      afterUpdate();
+      updated();
     }
-  }
-
-  void rerender() {
-    if (_previousTemplate == template) {
-      Logger().log(logKeys.General,
-          "Skipping rerender - template has not changed - todo: rerender children");
-      return;
-    }
-    Logger().log(logKeys.General, "Template changed - patching dom");
-    Element newEl = Element.html(this.template, validator: validator);
   }
 
   void _subscribeToState () {
@@ -111,26 +105,29 @@ class Component<P extends Props> extends VElement {
   void _subscribeAndRender(Event e) {
     this.render();
   }
-
-  void beforeUpdate() {
-    Logger().log(logKeys.Update, "beforeUpdate $name");
-  }
-  void afterUpdate() {
-    Logger().log(logKeys.Update, "afterUpdate $name");
-  }
   @override
   void destroy({bool parentMounted = true}) {
+    beforeDestroy();
     for (StreamSubscription s in _componentListeners) {
       s.cancel();
     }
     super.destroy(parentMounted: parentMounted);
+    destroyed();
   }
-  @override
+  void beforeCreate () {
+
+  }
+  void created () {
+
+  }
+  void beforeUpdate () {
+
+  }
+  void updated () {
+
+  }
   void beforeDestroy() {
-    Logger().log(logKeys.Destroy, "beforeDestroy $name");
   }
-  @override
-  void afterDestroy() {
-    Logger().log(logKeys.Destroy, "afterDestroy $name");
+  void destroyed() {
   }
 }

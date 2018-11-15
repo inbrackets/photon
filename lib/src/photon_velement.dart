@@ -32,8 +32,6 @@ class VElement {
       if (childTags.containsKey(e.tagName)) {
         // todo: components in lists
         if (e.attributes.keys.contains("p-props")) {
-          print("this is working");
-
           var props = rootComp.invoke(e.attributes["p-props"], []);
           print(props);
           Component comp = childTags[e.tagName].newInstance("withProps", [props, e.attributes["p-props"]]);
@@ -72,12 +70,17 @@ class VElement {
   }
 
   void patchEl(Element el) {
-    if (this is Component && this._tag != el.tagName) {
+    if (this is Component && (this as Component).tagNameI != el.tagName) {
+      (this as Component).destroy();
+      this.parseElementTree(this._root, el, this._parent, this._root.childTags);
+      return;
+    } else if (this is Component) {
+      //todo set props here
       (this as Component).render();
-    //todo: set props here
       return;
     }
     if (this._tag != el.tagName) {
+      this.destroy();
       this.parseElementTree(this._root, el, this._parent, this._root.childTags);
       return;
     }
@@ -184,9 +187,6 @@ class VElement {
 //    if (this._el is TextAreaElement && _attributes.keys.contains("value")) {
 //      (this._el as TextAreaElement).value = _attributes["value"];
 //    }
-    if (_parent != null) {
-      _parent.addChild(_el);
-    }
   }
 
   bool checkAttributes(String k) {
@@ -344,15 +344,9 @@ class VElement {
   }
 
   void destroy({bool parentMounted = true}) {
-    beforeDestroy();
     _cancelListeners();
     this._parent?.el?.children?.remove(this.el);
     this.children.forEach((VElement v) => v.destroy(parentMounted: false)); //todo this is removing child even when parent is unmounted - set mounted flag
-    afterDestroy();
-  }
-  void beforeDestroy() {
-  }
-  void afterDestroy() {
   }
 }
 

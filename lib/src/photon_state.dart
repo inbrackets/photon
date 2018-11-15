@@ -37,8 +37,9 @@ class StateValue<T> extends Function implements State<T> {
     return _value.toString();
   }
 
-  call (T val) {
-    value = val;
+  call ([T val]) {
+    if (val != null) {value = val;}
+    return value;
   }
   StreamSubscription subscribeType(String type, EventListener f) {
     return el.on[type].listen(f);

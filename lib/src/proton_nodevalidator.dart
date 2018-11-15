@@ -36,3 +36,8 @@ class TrustedNodeValidator implements NodeValidator {
     return _validator.allowsAttribute(element, attributeName, value);
   }
 }
+
+class TrustedNodeValidatorAll implements NodeValidator {
+  bool allowsElement(Element element) => true;
+  bool allowsAttribute(element, attributeName, value) => true;
+}
